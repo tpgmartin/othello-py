@@ -1,10 +1,11 @@
 import unittest
+from unittest import TestCase
 from unittest.mock import patch
 from io import StringIO
 
 from othello.board import Board
 
-class TestStringMethods(unittest.TestCase):
+class TestStringMethods(TestCase):
 
     def test_initial_board(self):
         board = Board()
