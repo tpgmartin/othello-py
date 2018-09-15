@@ -32,6 +32,7 @@ class Board():
                 str(self.__format_position(self.positions[row][6])) + "|" +
                 str(self.__format_position(self.positions[row][7]))
             )
+
             if row != len(self.positions)-1:
                 new_row += "\n_ _ _ _ _ _ _ _\n"
 
