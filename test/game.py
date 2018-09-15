@@ -30,11 +30,12 @@ class TestStringMethods(TestCase):
         self.assertEqual(fakeOutput.getvalue().rstrip(), dark_player_prompt)
 
     # TODO: Create multiple test cases
+    @unittest.skip("Return to later")
     def test_user_move_valid(self):
 
-        turn = "a8"
+        move = "a8"
 
-        self.assertEqual(Game.check_valid_move(turn), False)
+        self.assertEqual(Game.check_move_valid(move), False)
 
 
 
