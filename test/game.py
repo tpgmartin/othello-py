@@ -29,6 +29,13 @@ class TestStringMethods(TestCase):
 
         self.assertEqual(fakeOutput.getvalue().rstrip(), dark_player_prompt)
 
+    # TODO: Create multiple test cases
+    def test_user_move_valid(self):
+
+        turn = "a8"
+
+        self.assertEqual(Game.check_valid_move(turn), False)
+
 
 
 if __name__ == "__main__":

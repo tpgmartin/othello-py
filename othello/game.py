@@ -1,3 +1,4 @@
+from string import ascii_lowercase
 import sys
 
 from board import Board
@@ -9,15 +10,30 @@ class Game():
 
     def dark_player_turn(self):
         dark_player_turn = input("Dark player turn ...")
-        check_valid_move(dark_player_turn)
+
+        if not self.check_valid_move(dark_player_turn):
+            print('Invalid move')
+            self.dark_player_turn()
+
         print("Dark player chose", str(dark_player_turn))
 
     @staticmethod
     def check_valid_move(turn):
-        # Valid move must be of form <number><letter>
-        # Where number is between 1-8
-        # Where letter is between a-h
-        pass
+
+        try:
+            number = int(turn[0])
+        except ValueError:
+            return False
+
+        letter = turn[1]
+
+        if number not in range(8):
+            return False
+
+        if letter not in list(ascii_lowercase[0:8]):
+            return False
+
+        return True
 
 if __name__ == "__main__":
     Game()
