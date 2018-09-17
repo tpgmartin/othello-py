@@ -13,7 +13,7 @@ class Game():
         dark_player_turn = input("Dark player turn ...")
 
         if not self.check_move_valid(dark_player_turn):
-            print('Invalid move')
+            print('Invalid move, must be of format (0-7)(a-g)')
             self.dark_player_turn()
 
         print("Dark player chose", str(dark_player_turn))
@@ -42,27 +42,71 @@ class Game():
         row_index = int(move[0])
         column_index = ascii_lowercase[0:8].index(move[1])
 
-        return self.__check_neighbouring_pieces(move)
+        neighbouring_opponent_pieces = self.__check_neighbouring_pieces(move)
+        return neighbouring_opponent_pieces and self.__check_ending_piece(move, neighbouring_opponent_pieces)
 
     def __check_neighbouring_pieces(self, move):
 
-        neighbouring_pieces = []
         row_index = int(move[0])
         column_index = ascii_lowercase[0:8].index(move[1])
+        neighbouring_opponent_pieces = []
 
         # Need to handle case where moving to edge of board
-        target_rows = self.board.positions[row_index-1:row_index+2]
+        for row in range(row_index-1,row_index+2):
+            for column in range(column_index-1,column_index+2):
+                # Only consider dark player turn for time being
+                if self.board.positions[row][column] == 'l':
+                    opponent_piece = {
+                        "column_index": column,
+                        "row_index": row
+                    }
+                    neighbouring_opponent_pieces.append(opponent_piece)
 
-        for row in target_rows:
-            neighbouring_pieces.append(row[column_index-1:column_index+2])
-
-        neighbouring_pieces = [item for sublist in neighbouring_pieces for item in sublist]
-
-        # Only consider dark player turn for time being
-        if 'l' not in neighbouring_pieces:
+        if len(neighbouring_opponent_pieces) == 0:
             return False
 
-        return True
+        return neighbouring_opponent_pieces
+
+    def __check_ending_piece(self, move, neighbouring_opponent_pieces):
+        new_row_index = int(move[0])
+        new_column_index = ascii_lowercase[0:8].index(move[1])
+
+        print(new_row_index)
+        print(new_column_index)
+
+        # check clockwise from top of newly placed piece
+        for opponent_piece in neighbouring_opponent_pieces:
+            opponent_row_index = opponent_piece["row_index"]
+            opponent_column_index = opponent_piece["column_index"]
+            print(opponent_row_index)
+            print(opponent_column_index)
+            print(self.board.positions)
+            if (new_row_index - 1) == opponent_row_index and new_column_index == opponent_column_index:
+                # check for dark player piece in all rows from new_row_index-2, same column_index
+                # for row in range(new_row_index):
+                for row in range(8):
+                    print(self.board.positions[new_row_index][new_column_index])
+            elif (new_row_index - 1) == opponent_row_index and (new_column_index + 1) == opponent_column_index:
+                # check for dark player piece in all rows, columns in diagonal where row < oppoent index, column > opponent indices
+                pass
+            elif new_row_index == opponent_row_index and (new_column_index + 1) == opponent_column_index:
+                # check for dark player piece in all rows, columns in horizontal line where row == oppoent index, column > opponent indices
+                pass
+            elif (new_row_index + 1) == opponent_row_index and (new_column_index + 1) == opponent_column_index:
+                # check for dark player piece in all rows, columns in diagonal line where row, column > opponent indices
+                pass
+            elif (new_row_index + 1) == opponent_row_index and new_column_index == opponent_column_index:
+                # check for dark player piece in downwards vertical line all rows > opponent row indes, columns equal
+                pass
+            elif (new_row_index + 1) == opponent_row_index and (new_column_index - 1) == opponent_column_index:
+                # check for dark player piece in downwards diagonal line all rows > opponent row indes, columns < opponent
+                pass
+            elif new_row_index == opponent_row_index and (new_column_index - 1) == opponent_column_index:
+                # check for dark player piece in horizontal line all rows == opponent row indes, columns < opponent index
+                pass
+            else: 
+                # check for dark player piece in all rows, columns in diagonal where row, columns < opponent indices
+                pass
 
     # Valid moves in Othello
     # * Must be next to piece of other colour
