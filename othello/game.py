@@ -21,6 +21,7 @@ class Game():
     def check_move_valid(self, move):
         return self.__check_move_format(move) and self.__check_move_legal(move)
 
+    # Add additional console messages
     def __check_move_format(self, move):
         try:
             number = int(move[0])
@@ -71,24 +72,17 @@ class Game():
         new_row_index = int(move[0])
         new_column_index = ascii_lowercase[0:8].index(move[1])
 
-        print(new_row_index)
-        print(new_column_index)
-
         # check clockwise from top of newly placed piece
         for opponent_piece in neighbouring_opponent_pieces:
             opponent_row_index = opponent_piece["row_index"]
             opponent_column_index = opponent_piece["column_index"]
-            print(opponent_row_index)
-            print(opponent_column_index)
-            print(self.board.positions)
+
             if (new_row_index - 1) == opponent_row_index and new_column_index == opponent_column_index:
-                # check for dark player piece in all rows from new_row_index-2, same column_index
-                # for row in range(new_row_index):
-                for row in range(8):
-                    print(self.board.positions[new_row_index][new_column_index])
+                for row in range(new_row_index - 1):
+                    if self.board.positions[row][new_column_index] == 'd':
+                        return True
             elif (new_row_index - 1) == opponent_row_index and (new_column_index + 1) == opponent_column_index:
                 # check for dark player piece in all rows, columns in diagonal where row < oppoent index, column > opponent indices
-                pass
             elif new_row_index == opponent_row_index and (new_column_index + 1) == opponent_column_index:
                 # check for dark player piece in all rows, columns in horizontal line where row == oppoent index, column > opponent indices
                 pass
@@ -107,6 +101,8 @@ class Game():
             else: 
                 # check for dark player piece in all rows, columns in diagonal where row, columns < opponent indices
                 pass
+            
+            return False
 
     # Valid moves in Othello
     # * Must be next to piece of other colour
