@@ -13,7 +13,7 @@ class Game():
         dark_player_turn = input("Dark player turn ...")
 
         if not self.check_move_valid(dark_player_turn):
-            print('Invalid move, must be of format (0-7)(a-g)')
+            print('Invalid move, must be of format (0-7)(a-h)')
             self.dark_player_turn()
 
         print("Dark player chose", str(dark_player_turn))
