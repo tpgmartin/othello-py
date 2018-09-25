@@ -1,3 +1,4 @@
+import math
 from string import ascii_lowercase
 import sys
 
@@ -72,42 +73,25 @@ class Game():
         new_row_index = int(move[0])
         new_column_index = ascii_lowercase[0:8].index(move[1])
 
-        # check clockwise from top of newly placed piece
+        new_piece_position = 8 * (new_row_index % 8) + new_column_index
+
         for opponent_piece in neighbouring_opponent_pieces:
             opponent_row_index = opponent_piece["row_index"]
             opponent_column_index = opponent_piece["column_index"]
+            opponent_piece_position = 8 * (opponent_row_index % 8) + opponent_column_index
 
-            if (new_row_index - 1) == opponent_row_index and new_column_index == opponent_column_index:
-                for row in range(new_row_index - 1):
-                    if self.board.positions[row][new_column_index] == 'd':
-                        return True
-            elif (new_row_index - 1) == opponent_row_index and (new_column_index + 1) == opponent_column_index:
-                # check for dark player piece in all rows, columns in diagonal where row < oppoent index, column > opponent indices
-            elif new_row_index == opponent_row_index and (new_column_index + 1) == opponent_column_index:
-                # check for dark player piece in all rows, columns in horizontal line where row == oppoent index, column > opponent indices
-                pass
-            elif (new_row_index + 1) == opponent_row_index and (new_column_index + 1) == opponent_column_index:
-                # check for dark player piece in all rows, columns in diagonal line where row, column > opponent indices
-                pass
-            elif (new_row_index + 1) == opponent_row_index and new_column_index == opponent_column_index:
-                # check for dark player piece in downwards vertical line all rows > opponent row indes, columns equal
-                pass
-            elif (new_row_index + 1) == opponent_row_index and (new_column_index - 1) == opponent_column_index:
-                # check for dark player piece in downwards diagonal line all rows > opponent row indes, columns < opponent
-                pass
-            elif new_row_index == opponent_row_index and (new_column_index - 1) == opponent_column_index:
-                # check for dark player piece in horizontal line all rows == opponent row indes, columns < opponent index
-                pass
-            else: 
-                # check for dark player piece in all rows, columns in diagonal where row, columns < opponent indices
-                pass
+            # relative_position = new_piece_position - opponent_piece_position
+            position_to_check = 2 * opponent_piece_position - new_piece_position
+            while position_to_check > 0:
+                column = position_to_check % 8
+                row = math.floor(position_to_check / 8)
+                if self.board.positions[row][column] == 'd':
+                    return True
+                elif self.board.positions[row][column] == None:
+                    return False
+                position_to_check - relative_position
             
             return False
-
-    # Valid moves in Othello
-    # * Must be next to piece of other colour
-    # * Must exist straight line from position of new piece to
-    #   another piece of same colour
 
 if __name__ == "__main__":
     Game()
