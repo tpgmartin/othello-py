@@ -8,16 +8,18 @@ class Game():
 
     def __init__(self):
         self.board = Board()
-        self.dark_player_turn()
+        self.current_player_turn = "Dark"
+        self.player_turn()
 
-    def dark_player_turn(self):
-        dark_player_turn = input("Dark player turn ...")
+    def player_turn(self):
+        player_prompt = self.current_player_turn + " player turn ..."
+        player_turn = input(player_prompt)
 
-        if not self.check_move_valid(dark_player_turn):
-            print('Invalid move, must be of format (0-7)(a-h)')
-            self.dark_player_turn()
+        if not self.check_move_valid(player_turn):
+            self.player_turn()
 
-        print("Dark player chose", str(dark_player_turn))
+        output = self.current_player_turn + " player chose " + str(player_turn)
+        print(output)
 
     def check_move_valid(self, move):
         return self.__check_move_format(move) and self.__check_move_legal(move)
@@ -53,11 +55,10 @@ class Game():
         column_index = ascii_lowercase[0:8].index(move[1])
         neighbouring_opponent_pieces = []
 
-        # Need to handle case where moving to edge of board
         for row in range(row_index-1,row_index+2):
             for column in range(column_index-1,column_index+2):
-                # Only consider dark player turn for time being
-                if self.board.positions[row][column] == 'l':
+                opponent_piece_colour = "l" if self.current_player_turn == "Dark" else "d"
+                if self.board.positions[row][column] == opponent_piece_colour:
                     opponent_piece = {
                         "column_index": column,
                         "row_index": row
@@ -80,12 +81,12 @@ class Game():
             opponent_column_index = opponent_piece["column_index"]
             opponent_piece_position = 8 * (opponent_row_index % 8) + opponent_column_index
 
-            # relative_position = new_piece_position - opponent_piece_position
             position_to_check = 2 * opponent_piece_position - new_piece_position
+            current_player_piece_colour = self.current_player_turn[0].lower()
             while position_to_check > 0:
                 column = position_to_check % 8
                 row = math.floor(position_to_check / 8)
-                if self.board.positions[row][column] == 'd':
+                if self.board.positions[row][column] == current_player_piece_colour:
                     return True
                 elif self.board.positions[row][column] == None:
                     return False
