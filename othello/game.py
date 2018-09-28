@@ -14,14 +14,22 @@ class Game():
 
     def player_turn(self):
         player_prompt = self.current_player_turn + " player turn ..."
-        player_turn = input(player_prompt)
+        move = input(player_prompt)
 
-        if not self.check_move_valid(player_turn):
+        if not self.check_move_valid(move):
             self.player_turn()
 
+        new_row_index = int(move[0])
+        new_column_index = ascii_lowercase[0:8].index(move[1])
+
+        piece_colour = "d" if self.current_player_turn == "Dark" else "l"
+        self.board.positions[new_row_index][new_column_index] = piece_colour
         # need to clear output on previously unsuccessful attempts
-        output = self.current_player_turn + " player chose " + str(player_turn)
+        output = self.current_player_turn + " player chose " + str(move)
         print(output)
+
+        self.current_player_turn = "Dark" if self.current_player_turn == "Light" else "Light"
+        self.player_turn()
 
     def check_move_valid(self, move):
         return self.__check_move_format(move) and self.__check_move_legal(move)
@@ -46,12 +54,19 @@ class Game():
         return True
 
     def __check_move_legal(self, move):
-
-        row_index = int(move[0])
-        column_index = ascii_lowercase[0:8].index(move[1])
+        if not self.__check_space_free(move):
+            print(INVALID_MOVE_SPACE_OCCUPIED)
+            return False
 
         neighbouring_opponent_pieces = self.__check_neighbouring_pieces(move)
         return neighbouring_opponent_pieces and self.__check_ending_piece(move, neighbouring_opponent_pieces)
+
+    def __check_space_free(self, move):
+
+        new_row_index = int(move[0])
+        new_column_index = ascii_lowercase[0:8].index(move[1])
+
+        return self.board.positions[new_row_index][new_column_index] == None
 
     def __check_neighbouring_pieces(self, move):
 
@@ -99,7 +114,7 @@ class Game():
                 if self.board.positions[row][column] == current_player_piece_colour:
                     return True
                 elif self.board.positions[row][column] == None:
-                    print(INVALID_SPACES_BETWEEN_PIECES)
+                    print(INVALID_MOVE_SPACES_BETWEEN_PIECES)
                     return False
                 position_to_check - relative_position
             
