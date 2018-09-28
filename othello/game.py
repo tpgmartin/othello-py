@@ -1,17 +1,26 @@
-import json
-import math
+from math import floor
 from string import ascii_lowercase
-import sys
 
 from board import Board
 from messages import *
+from player import Player
 
+# TODO
+# * Change colour of pieces following move
+# * Pass player turn if move not possible
+# * Handle forced moves
+# * Check end of game
+# * Determine winning player
+# * Restart game
+#
+
+# Move behaviour to player class
 class Game():
 
     def __init__(self):
         self.board = Board()
-        self.player_scores = {"Dark": 0, "Light": 0}
-        self.current_player_turn = "Dark"
+        self.players = [Player("Dark"), Player("Light")]
+        self.current_player_turn = "Dark" # reference Player instance, and below
         self.player_turn()
 
     def player_turn(self):
@@ -32,14 +41,15 @@ class Game():
         print(output)
 
         self.calculate_player_scores()
-        print("Dark player has", self.player_scores["Dark"], "points, Light player has", self.player_scores["Light"],"points")
+        for player in self.players:
+            print(player.colour, "player has", player.points, "points")
 
         self.current_player_turn = "Dark" if self.current_player_turn == "Light" else "Light"
         self.player_turn()
 
     def calculate_player_scores(self):
-        self.player_scores["Dark"] = sum(row.count("d") for row in self.board.positions)
-        self.player_scores["Light"] = sum(row.count("l") for row in self.board.positions)
+        for player in self.players:
+            player.points = sum(row.count(player.colour.lower()[0]) for row in self.board.positions)
 
 
     def check_move_valid(self, move):
@@ -121,7 +131,7 @@ class Game():
             current_player_piece_colour = self.current_player_turn[0].lower()
             while position_to_check > 0:
                 column = position_to_check % 8
-                row = math.floor(position_to_check / 8)
+                row = floor(position_to_check / 8)
                 if self.board.positions[row][column] == current_player_piece_colour:
                     return True
                 elif self.board.positions[row][column] == None:
