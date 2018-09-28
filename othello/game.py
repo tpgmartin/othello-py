@@ -1,3 +1,4 @@
+import json
 import math
 from string import ascii_lowercase
 import sys
@@ -9,6 +10,7 @@ class Game():
 
     def __init__(self):
         self.board = Board()
+        self.player_scores = {"Dark": 0, "Light": 0}
         self.current_player_turn = "Dark"
         self.player_turn()
 
@@ -19,6 +21,7 @@ class Game():
         if not self.check_move_valid(move):
             self.player_turn()
 
+        # Refactor this
         new_row_index = int(move[0])
         new_column_index = ascii_lowercase[0:8].index(move[1])
 
@@ -28,8 +31,16 @@ class Game():
         output = self.current_player_turn + " player chose " + str(move)
         print(output)
 
+        self.calculate_player_scores()
+        print("Dark player has", self.player_scores["Dark"], "points, Light player has", self.player_scores["Light"],"points")
+
         self.current_player_turn = "Dark" if self.current_player_turn == "Light" else "Light"
         self.player_turn()
+
+    def calculate_player_scores(self):
+        self.player_scores["Dark"] = sum(row.count("d") for row in self.board.positions)
+        self.player_scores["Light"] = sum(row.count("l") for row in self.board.positions)
+
 
     def check_move_valid(self, move):
         return self.__check_move_format(move) and self.__check_move_legal(move)
