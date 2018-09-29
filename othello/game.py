@@ -6,7 +6,6 @@ from messages import *
 from player import Player
 
 # TODO
-# * Change colour of pieces following move
 # * Pass player turn if move not possible
 # * Handle forced moves
 # * Check end of game
@@ -40,6 +39,8 @@ class Game():
         print(output)
 
         self.calculate_player_scores()
+        self.board.print()
+        # Move to Player class
         for player in self.players:
             print(player.colour, "player has", player.points, "points")
 
@@ -121,16 +122,28 @@ class Game():
         new_piece_position = 8 * (new_row_index % 8) + new_column_index
 
         for opponent_piece in neighbouring_opponent_pieces:
+            pieces_to_update = []
+
             opponent_row_index = opponent_piece["row_index"]
             opponent_column_index = opponent_piece["column_index"]
-            opponent_piece_position = 8 * (opponent_row_index % 8) + opponent_column_index
+            pieces_to_update.append({
+                "column": opponent_column_index,
+                "row": opponent_row_index
+            })
 
+            opponent_piece_position = 8 * (opponent_row_index % 8) + opponent_column_index
             relative_position = new_piece_position - opponent_piece_position
             position_to_check = opponent_piece_position - relative_position
             while position_to_check > 0:
                 column = position_to_check % 8
                 row = floor(position_to_check / 8)
+                piece_to_update = {
+                    "column": column,
+                    "row": row
+                }
+                pieces_to_update.append(piece_to_update)
                 if self.board.positions[row][column] == self.current_player_turn.piece:
+                    self.__update_board_pieces(pieces_to_update)
                     return True
                 elif self.board.positions[row][column] == None:
                     print(INVALID_MOVE_SPACES_BETWEEN_PIECES)
@@ -139,6 +152,12 @@ class Game():
             
             print(INVALID_MOVE_NOT_ENCLOSING_PIECE)
             return False
+
+    def __update_board_pieces(self, pieces):
+        for piece in pieces:
+            column = piece["column"]
+            row = piece["row"]
+            self.board.positions[row][column] = self.current_player_turn.piece
 
 if __name__ == "__main__":
     Game()
