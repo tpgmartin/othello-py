@@ -20,11 +20,11 @@ class Game():
     def __init__(self):
         self.board = Board()
         self.players = [Player("Dark"), Player("Light")]
-        self.current_player_turn = "Dark" # reference Player instance, and below
+        self.current_player_turn = self.players[0] # reference Player instance, and below
         self.player_turn()
 
     def player_turn(self):
-        player_prompt = self.current_player_turn + " player turn ..."
+        player_prompt = self.current_player_turn.colour + " player turn ..."
         move = input(player_prompt)
 
         if not self.check_move_valid(move):
@@ -34,17 +34,16 @@ class Game():
         new_row_index = int(move[0])
         new_column_index = ascii_lowercase[0:8].index(move[1])
 
-        piece_colour = "d" if self.current_player_turn == "Dark" else "l"
-        self.board.positions[new_row_index][new_column_index] = piece_colour
+        self.board.positions[new_row_index][new_column_index] = self.current_player_turn.piece
         # need to clear output on previously unsuccessful attempts
-        output = self.current_player_turn + " player chose " + str(move)
+        output = self.current_player_turn.colour + " player chose " + str(move)
         print(output)
 
         self.calculate_player_scores()
         for player in self.players:
             print(player.colour, "player has", player.points, "points")
 
-        self.current_player_turn = "Dark" if self.current_player_turn == "Light" else "Light"
+        self.current_player_turn = self.players[(self.players.index(self.current_player_turn) + 1) % 2]
         self.player_turn()
 
     def calculate_player_scores(self):
@@ -98,7 +97,7 @@ class Game():
         for row in range(row_index-1,row_index+2):
             for column in range(column_index-1,column_index+2):
                 try:
-                    opponent_piece_colour = "l" if self.current_player_turn == "Dark" else "d"
+                    opponent_piece_colour = self.players[(self.players.index(self.current_player_turn) + 1) % 2].piece
                     if self.board.positions[row][column] == opponent_piece_colour:
                             opponent_piece = {
                                 "column_index": column,
@@ -128,11 +127,10 @@ class Game():
 
             relative_position = new_piece_position - opponent_piece_position
             position_to_check = opponent_piece_position - relative_position
-            current_player_piece_colour = self.current_player_turn[0].lower()
             while position_to_check > 0:
                 column = position_to_check % 8
                 row = floor(position_to_check / 8)
-                if self.board.positions[row][column] == current_player_piece_colour:
+                if self.board.positions[row][column] == self.current_player_turn.piece:
                     return True
                 elif self.board.positions[row][column] == None:
                     print(INVALID_MOVE_SPACES_BETWEEN_PIECES)
