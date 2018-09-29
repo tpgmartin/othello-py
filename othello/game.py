@@ -35,14 +35,13 @@ class Game():
 
         self.board.positions[new_row_index][new_column_index] = self.current_player_turn.piece
         # need to clear output on previously unsuccessful attempts
-        output = self.current_player_turn.colour + " player chose " + str(move)
-        print(output)
+        self.current_player_turn.print_player_move(move)
 
         self.calculate_player_scores()
         self.board.print()
-        # Move to Player class
+
         for player in self.players:
-            print(player.colour, "player has", player.points, "points")
+            player.print_player_points()
 
         self.current_player_turn = self.players[(self.players.index(self.current_player_turn) + 1) % 2]
         self.player_turn()
