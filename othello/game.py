@@ -7,7 +7,8 @@ from player import Player
 
 # TODO
 # * Pass player turn if move not possible
-# * Handle forced moves
+# * Find list of possible moves
+# * Handle forced moves - only one possible move
 # * Check end of game - no move possible
 # * Restart game
 #
@@ -21,26 +22,34 @@ class Game():
         self.current_player_turn = self.players[0] # reference Player instance, and below
 
     def player_turn(self):
+        if not self.check_move_possible():
+            self.current_player_turn = self.players[(self.players.index(self.current_player_turn) + 1) % 2]
+            self.player_turn()
+
         player_prompt = self.current_player_turn.colour + " player turn ..."
         move = input(player_prompt)
 
-        if not self.check_move_valid(move):
+        if not self.__check_move_valid(move):
             self.player_turn()
 
         # Refactor this
         new_row_index = int(move[0])
         new_column_index = ascii_lowercase[0:8].index(move[1])
 
+        # Update board with player move
         self.board.positions[new_row_index][new_column_index] = self.current_player_turn.piece
         # need to clear output on previously unsuccessful attempts
         self.current_player_turn.print_player_move(move)
 
+        # Find new scores, print current board positions
         self.calculate_player_scores()
         self.board.print()
 
+        # Print player points after move
         for player in self.players:
             player.print_player_points()
 
+        # Switch between players
         self.current_player_turn = self.players[(self.players.index(self.current_player_turn) + 1) % 2]
         self.player_turn()
 
@@ -58,7 +67,46 @@ class Game():
         else:
             print("It's a draw!")
 
-    def check_move_valid(self, move):
+    def check_move_possible(self):
+        # For these directions find there is an empty space in same direction
+        # Abort if find piece of current player colour
+
+        current_pieces = []
+        neighbouring_opponent_pieces = []
+
+        for row_idx, row in enumerate(self.board.positions):
+            for column_idx, column in enumerate(row):
+                if column == self.current_player_turn.piece:
+                    position = {
+                        "column_idx": column_idx,
+                        "row_idx": row_idx
+                    }
+                    current_pieces.append(position)
+        
+        # current_pieces -> [{'column': 4, 'row': 3}, {'column': 3, 'row': 4}]
+
+        for piece in current_pieces:
+            for row_idx in range(piece["row_idx"]-1,piece["row_idx"]+2):
+                for column_idx in range(piece["column_idx"]-1,piece["column_idx"]+2):
+                    try:
+                        opponent_piece_colour = self.players[(self.players.index(self.current_player_turn) + 1) % 2].piece
+                        if self.board.positions[row_idx][column_idx] == opponent_piece_colour:
+                                opponent_piece = {
+                                    "column_idx": column_idx,
+                                    "row_idx": row_idx
+                                }
+                                neighbouring_opponent_pieces.append(opponent_piece)
+                    except IndexError:
+                        continue
+
+        # follow implementation of __check_ending_piece
+        # find direction to look, starting from current_player.piece to 
+        # nearest opponent piece, continue until find empty space - True
+        # or abort if find another piece from current_player
+
+        print(neighbouring_opponent_pieces)
+
+    def __check_move_valid(self, move):
         return self.__check_move_format(move) and self.__check_move_legal(move)
 
     def __check_move_format(self, move):
@@ -167,4 +215,5 @@ class Game():
 
 if __name__ == "__main__":
     game = Game()
-    game.player_turn()
+    # game.player_turn()
+    game.check_move_possible()
