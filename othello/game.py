@@ -8,8 +8,7 @@ from player import Player
 # TODO
 # * Pass player turn if move not possible
 # * Handle forced moves
-# * Check end of game
-# * Determine winning player
+# * Check end of game - no move possible
 # * Restart game
 #
 
@@ -20,7 +19,6 @@ class Game():
         self.board = Board()
         self.players = [Player("Dark"), Player("Light")]
         self.current_player_turn = self.players[0] # reference Player instance, and below
-        self.player_turn()
 
     def player_turn(self):
         player_prompt = self.current_player_turn.colour + " player turn ..."
@@ -50,6 +48,15 @@ class Game():
         for player in self.players:
             player.points = sum(row.count(player.colour.lower()[0]) for row in self.board.positions)
 
+    def determine_winner(self):
+        dark_player = self.players[0]
+        light_player = self.players[1]
+        if dark_player.points > light_player.points:
+            print(dark_player.colour, "player wins!")
+        elif dark_player.points < light_player.points:
+            print(light_player.colour, "player wins!")
+        else:
+            print("It's a draw!")
 
     def check_move_valid(self, move):
         return self.__check_move_format(move) and self.__check_move_legal(move)
@@ -159,4 +166,5 @@ class Game():
             self.board.positions[row][column] = self.current_player_turn.piece
 
 if __name__ == "__main__":
-    Game()
+    game = Game()
+    game.player_turn()
