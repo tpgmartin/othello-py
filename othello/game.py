@@ -71,40 +71,56 @@ class Game():
         # For these directions find there is an empty space in same direction
         # Abort if find piece of current player colour
 
-        current_pieces = []
-        neighbouring_opponent_pieces = []
+        possible_moves = []
 
         for row_idx, row in enumerate(self.board.positions):
             for column_idx, column in enumerate(row):
                 if column == self.current_player_turn.piece:
-                    position = {
-                        "column_idx": column_idx,
-                        "row_idx": row_idx
-                    }
-                    current_pieces.append(position)
-        
-        # current_pieces -> [{'column': 4, 'row': 3}, {'column': 3, 'row': 4}]
+                    position = 8 * (row_idx % 8) + column_idx
+                    possible_moves.append(dict([(position, [])]))
 
-        for piece in current_pieces:
-            for row_idx in range(piece["row_idx"]-1,piece["row_idx"]+2):
-                for column_idx in range(piece["column_idx"]-1,piece["column_idx"]+2):
+        print('possible_moves')
+        print(possible_moves)
+        print('--------------')
+        for idx, move in enumerate(possible_moves):
+            current_idx = list(move.keys())[0]
+            print(current_idx)
+            column_idx = current_idx % 8
+            row_idx = floor(current_idx / 8)
+            for row_idx in range(row_idx-1,row_idx+2):
+                for column_idx in range(column_idx-1,column_idx+2):
                     try:
                         opponent_piece_colour = self.players[(self.players.index(self.current_player_turn) + 1) % 2].piece
+                        print(self.board.positions[row_idx][column_idx])
                         if self.board.positions[row_idx][column_idx] == opponent_piece_colour:
                                 opponent_piece = {
                                     "column_idx": column_idx,
                                     "row_idx": row_idx
                                 }
-                                neighbouring_opponent_pieces.append(opponent_piece)
+
+                                # Refactor method row, column to num
+                                # player_piece_position = 8 * (piece["row_idx"] % 8) + piece["column_idx"]
+                                opponent_piece_position = 8 * (row_idx % 8) + column_idx
+                                relative_position = current_idx - opponent_piece_position
+                                position_to_check = opponent_piece_position - relative_position
+                                while position_to_check > 0:
+                                    column = position_to_check % 8
+                                    row = floor(position_to_check / 8)
+                                    if self.board.positions[row][column] == None:
+                                        possible_moves[idx][current_idx].append({
+                                            "column_idx": column,
+                                            "row_idx": row
+                                        })
+                                        break
+                                    if self.board.positions[row][column] == self.current_player_turn.piece:
+                                        break
+                                    position_to_check - relative_position
+
                     except IndexError:
                         continue
-
-        # follow implementation of __check_ending_piece
-        # find direction to look, starting from current_player.piece to 
-        # nearest opponent piece, continue until find empty space - True
-        # or abort if find another piece from current_player
-
-        print(neighbouring_opponent_pieces)
+        print(possible_moves)
+        self.possible_moves = possible_moves
+        return len(possible_moves) > 0
 
     def __check_move_valid(self, move):
         return self.__check_move_format(move) and self.__check_move_legal(move)
