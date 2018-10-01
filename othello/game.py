@@ -6,10 +6,9 @@ from messages import *
 from player import Player
 
 # TODO
-# * Pass player turn if move not possible
-# * Find list of possible moves
-# * Handle forced moves - only one possible move
-# * Check end of game - no move possible
+# * Find list of possible moves - use this to determine if move valid
+# * Display list of possible moves to player
+# * Check end of game - either no possible moves or no empty spaces
 # * Restart game
 #
 
@@ -17,14 +16,29 @@ from player import Player
 class Game():
 
     def __init__(self):
+        self.restart()
+
+    def restart(self):
         self.board = Board()
         self.players = [Player("Dark"), Player("Light")]
         self.current_player_turn = self.players[0] # reference Player instance, and below
+        self.possible_moves = []
 
     def player_turn(self):
         if not self.check_move_possible():
+            print(MOVE_NOT_POSSIBLE)
             self.current_player_turn = self.players[(self.players.index(self.current_player_turn) + 1) % 2]
             self.player_turn()
+
+        if len(self.possible_moves) == 1 and len(list(self.possible_moves[0].values())[0]) == 1:
+            print(FORCED_MOVE)
+            forced_move = list(self.possible_moves[0].values())[0][0]
+            column_idx = forced_move % 8
+            row_idx = floor(forced_move / 8)
+            self.board.positions[row_idx][column_idx] = self.current_player_turn.piece
+            self.current_player_turn = self.players[(self.players.index(self.current_player_turn) + 1) % 2]
+            self.player_turn()
+
 
         player_prompt = self.current_player_turn.colour + " player turn ..."
         move = input(player_prompt)
@@ -68,9 +82,6 @@ class Game():
             print("It's a draw!")
 
     def check_move_possible(self):
-        # For these directions find there is an empty space in same direction
-        # Abort if find piece of current player colour
-
         possible_moves = []
 
         for row_idx, row in enumerate(self.board.positions):
@@ -79,46 +90,34 @@ class Game():
                     position = 8 * (row_idx % 8) + column_idx
                     possible_moves.append(dict([(position, [])]))
 
-        print('possible_moves')
-        print(possible_moves)
-        print('--------------')
         for idx, move in enumerate(possible_moves):
             current_idx = list(move.keys())[0]
-            print(current_idx)
-            column_idx = current_idx % 8
-            row_idx = floor(current_idx / 8)
-            for row_idx in range(row_idx-1,row_idx+2):
-                for column_idx in range(column_idx-1,column_idx+2):
-                    try:
-                        opponent_piece_colour = self.players[(self.players.index(self.current_player_turn) + 1) % 2].piece
-                        print(self.board.positions[row_idx][column_idx])
-                        if self.board.positions[row_idx][column_idx] == opponent_piece_colour:
-                                opponent_piece = {
-                                    "column_idx": column_idx,
-                                    "row_idx": row_idx
-                                }
+            for diff in [-9, -8, -7, -1, +1, +7, +8, +9]:
+                opponent_piece_position = current_idx + diff
+                column_idx = opponent_piece_position % 8
+                row_idx = floor(opponent_piece_position / 8)
+                try:
+                    opponent_piece_colour = self.players[(self.players.index(self.current_player_turn) + 1) % 2].piece
+                    if self.board.positions[row_idx][column_idx] == opponent_piece_colour:
+                            opponent_piece = {
+                                "column_idx": column_idx,
+                                "row_idx": row_idx
+                            }
+                            relative_position = current_idx - opponent_piece_position
+                            position_to_check = opponent_piece_position - relative_position
+                            while position_to_check > 0:
+                                column = position_to_check % 8
+                                row = floor(position_to_check / 8)
+                                if self.board.positions[row][column] == None:
+                                    possible_moves[idx][current_idx].append(position_to_check)
+                                    break
+                                if self.board.positions[row][column] == self.current_player_turn.piece:
+                                    break
+                                position_to_check - relative_position
 
-                                # Refactor method row, column to num
-                                # player_piece_position = 8 * (piece["row_idx"] % 8) + piece["column_idx"]
-                                opponent_piece_position = 8 * (row_idx % 8) + column_idx
-                                relative_position = current_idx - opponent_piece_position
-                                position_to_check = opponent_piece_position - relative_position
-                                while position_to_check > 0:
-                                    column = position_to_check % 8
-                                    row = floor(position_to_check / 8)
-                                    if self.board.positions[row][column] == None:
-                                        possible_moves[idx][current_idx].append({
-                                            "column_idx": column,
-                                            "row_idx": row
-                                        })
-                                        break
-                                    if self.board.positions[row][column] == self.current_player_turn.piece:
-                                        break
-                                    position_to_check - relative_position
-
-                    except IndexError:
+                except IndexError:
                         continue
-        print(possible_moves)
+
         self.possible_moves = possible_moves
         return len(possible_moves) > 0
 
@@ -231,5 +230,4 @@ class Game():
 
 if __name__ == "__main__":
     game = Game()
-    # game.player_turn()
-    game.check_move_possible()
+    game.player_turn()

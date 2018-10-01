@@ -1,3 +1,4 @@
+FORCED_MOVE = "Forced move for player"
 INVALID_MOVE_FORMAT = "Invalid move, must be of format (0-7)(a-h)"
 INVALID_MOVE_FORMAT_FIRST_CHARACTER = "Invalid move, first character must be number between 0-7"
 INVALID_MOVE_FORMAT_SECOND_CHARACTER = "Invalid move, second character must be letter between a-h"
@@ -5,3 +6,4 @@ INVALID_MOVE_NO_NEIGHBOURING_OPPONENT_PIECE = "Invalid move, must place your pie
 INVALID_MOVE_NOT_ENCLOSING_PIECE = "Invalid move, must enclose opponent's pieces by your pieces"
 INVALID_MOVE_SPACES_BETWEEN_PIECES = "Invalid move, cannot have spaces between pieces"
 INVALID_MOVE_SPACE_OCCUPIED = "Invalid move, space is already occupied"
+MOVE_NOT_POSSIBLE = "No move possible this turn"
