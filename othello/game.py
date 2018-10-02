@@ -1,5 +1,6 @@
 from math import floor
 from string import ascii_lowercase
+import sys
 
 from board import Board
 from messages import *
@@ -9,7 +10,6 @@ from player import Player
 # * Find list of possible moves - use this to determine if move valid
 # * Display list of possible moves to player
 # * Check end of game - either no possible moves or no empty spaces
-# * Restart game
 #
 
 # Move behaviour to player class
@@ -23,8 +23,13 @@ class Game():
         self.players = [Player("Dark"), Player("Light")]
         self.current_player_turn = self.players[0] # reference Player instance, and below
         self.possible_moves = []
+        self.player_turn()
 
     def player_turn(self):
+        if not any(None in row for row in self.board.positions):
+            self.determine_winner()
+            self.prompt_new_game()
+
         if not self.check_move_possible():
             print(MOVE_NOT_POSSIBLE)
             self.current_player_turn = self.players[(self.players.index(self.current_player_turn) + 1) % 2]
@@ -79,7 +84,18 @@ class Game():
         elif dark_player.points < light_player.points:
             print(light_player.colour, "player wins!")
         else:
-            print("It's a draw!")
+            print(DETERMINE_DRAW)
+
+    def prompt_new_game(self):
+        choice = input(PROMPT_NEW_GAME)
+        if choice == "y":
+            print(PROMPT_NEW_GAME)
+            self.restart()
+        elif choice == "n":
+            print(PROMPT_END_GAME)
+            sys.exit()
+        else:
+            print(PROMPT_START_NEW_GAME_WRONG)
 
     def check_move_possible(self):
         possible_moves = []
@@ -230,4 +246,3 @@ class Game():
 
 if __name__ == "__main__":
     game = Game()
-    game.player_turn()

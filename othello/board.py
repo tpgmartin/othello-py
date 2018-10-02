@@ -15,14 +15,15 @@ class Board():
     
     def print(self):
         formatted_board = self.__format_board()
-        print(formatted_board)
+        print(formatted_board, "\n")
 
     def __format_board(self):
 
-        formatted_board = ""
+        formatted_board = "  a b c d e f g h\n"
 
         for row in range(len(self.positions)):
             new_row = (
+                str(row) + " " +
                 str(self.__format_position(self.positions[row][0])) + "|" +
                 str(self.__format_position(self.positions[row][1])) + "|" +
                 str(self.__format_position(self.positions[row][2])) + "|" +
@@ -34,7 +35,7 @@ class Board():
             )
 
             if row != len(self.positions)-1:
-                new_row += "\n_ _ _ _ _ _ _ _\n"
+                new_row += "\n  _ _ _ _ _ _ _ _\n"
 
             formatted_board += new_row
 
