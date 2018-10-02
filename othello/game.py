@@ -9,7 +9,6 @@ from player import Player
 # TODO
 # * Find list of possible moves - use this to determine if move valid
 # * Display list of possible moves to player
-# * Check end of game - either no possible moves or no empty spaces
 #
 
 # Move behaviour to player class
@@ -19,19 +18,20 @@ class Game():
         self.restart()
 
     def restart(self):
+        print(BRANDING)
         self.board = Board()
         self.players = [Player("Dark"), Player("Light")]
         self.current_player_turn = self.players[0] # reference Player instance, and below
         self.possible_moves = []
+        self.consecutive_skipped_turns = 0
         self.player_turn()
 
     def player_turn(self):
-        if not any(None in row for row in self.board.positions):
-            self.determine_winner()
-            self.prompt_new_game()
+        self.check_game_continues()
 
         if not self.check_move_possible():
             print(MOVE_NOT_POSSIBLE)
+            self.consecutive_skipped_turns += 1
             self.current_player_turn = self.players[(self.players.index(self.current_player_turn) + 1) % 2]
             self.player_turn()
 
@@ -46,6 +46,7 @@ class Game():
 
 
         player_prompt = self.current_player_turn.colour + " player turn ..."
+        self.board.print()
         move = input(player_prompt)
 
         if not self.__check_move_valid(move):
@@ -58,11 +59,11 @@ class Game():
         # Update board with player move
         self.board.positions[new_row_index][new_column_index] = self.current_player_turn.piece
         # need to clear output on previously unsuccessful attempts
+        self.consecutive_skipped_turns = 0
         self.current_player_turn.print_player_move(move)
 
         # Find new scores, print current board positions
         self.calculate_player_scores()
-        self.board.print()
 
         # Print player points after move
         for player in self.players:
@@ -97,6 +98,11 @@ class Game():
         else:
             print(PROMPT_START_NEW_GAME_WRONG)
 
+    def check_game_continues(self):
+        if not any(None in row for row in self.board.positions) or self.consecutive_skipped_turns > 1:
+            self.determine_winner()
+            self.prompt_new_game()
+
     def check_move_possible(self):
         possible_moves = []
 
@@ -122,6 +128,7 @@ class Game():
                             relative_position = current_idx - opponent_piece_position
                             position_to_check = opponent_piece_position - relative_position
                             while position_to_check > 0:
+                                # got crash here when selecting 4g as light player
                                 column = position_to_check % 8
                                 row = floor(position_to_check / 8)
                                 if self.board.positions[row][column] == None:

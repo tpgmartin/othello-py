@@ -1,3 +1,4 @@
+BRANDING = "OTHELLO PY\n"
 DETERMINE_DRAW = "It's a draw!"
 FORCED_MOVE = "Forced move for player"
 INVALID_MOVE_FORMAT = "Invalid move, must be of format (0-7)(a-h)"
