@@ -19,7 +19,7 @@ class Board():
 
     def __format_board(self):
 
-        formatted_board = "  a b c d e f g h\n"
+        formatted_board = "\n  a b c d e f g h\n"
 
         for row in range(len(self.positions)):
             new_row = (

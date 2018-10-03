@@ -11,4 +11,4 @@ class Player():
         print(self.colour + " player chose " + str(move), "\n")
 
     def print_player_points(self):
-        print(self.colour, "player has", self.points, "points", "\n")
+        print(self.colour, "player has", self.points, "points")

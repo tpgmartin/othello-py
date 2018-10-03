@@ -8,7 +8,6 @@ from player import Player
 
 # TODO
 # * Find list of possible moves - use this to determine if move valid
-# * Display list of possible moves to player
 #
 
 # Move behaviour to player class
@@ -35,6 +34,17 @@ class Game():
             self.current_player_turn = self.players[(self.players.index(self.current_player_turn) + 1) % 2]
             self.player_turn()
 
+        player_prompt = self.current_player_turn.colour + " player turn ..."
+
+        for combinations in self.possible_moves:
+            for key in combinations:
+                for move in combinations[key]:
+                    column_idx = move % 8
+                    row_idx = floor(move / 8)
+                    self.board.positions[row_idx][column_idx] = "•"
+
+        self.board.print()
+
         if len(self.possible_moves) == 1 and len(list(self.possible_moves[0].values())[0]) == 1:
             print(FORCED_MOVE)
             forced_move = list(self.possible_moves[0].values())[0][0]
@@ -44,10 +54,12 @@ class Game():
             self.current_player_turn = self.players[(self.players.index(self.current_player_turn) + 1) % 2]
             self.player_turn()
 
-
-        player_prompt = self.current_player_turn.colour + " player turn ..."
-        self.board.print()
         move = input(player_prompt)
+
+        for row_idx, row in enumerate(self.board.positions):
+            for column_idx, column in enumerate(row):
+                if column == "•":
+                    self.board.positions[row_idx][column_idx] = None
 
         if not self.__check_move_valid(move):
             self.player_turn()
