@@ -99,6 +99,9 @@ class Game():
         else:
             print(DETERMINE_DRAW)
 
+        for player in self.players:
+            player.print_player_points()
+
     def prompt_new_game(self):
         choice = input(PROMPT_NEW_GAME)
         if choice == "y":
