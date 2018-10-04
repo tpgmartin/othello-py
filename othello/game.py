@@ -8,6 +8,7 @@ from player import Player
 
 # TODO
 # * Find list of possible moves - use this to determine if move valid
+# * Does not accept valid move if more than one of current player's pieces in same line
 #
 
 # Move behaviour to player class
@@ -141,8 +142,8 @@ class Game():
                                 "row_idx": row_idx
                             }
                             relative_position = current_idx - opponent_piece_position
-                            position_to_check = opponent_piece_position - relative_position
-                            while position_to_check > 0:
+                            position_to_check = opponent_piece_position + diff
+                            while (position_to_check > 0) and (position_to_check < 64):
                                 # got crash here when selecting 4g as light player
                                 column = position_to_check % 8
                                 row = floor(position_to_check / 8)
@@ -151,7 +152,7 @@ class Game():
                                     break
                                 if self.board.positions[row][column] == self.current_player_turn.piece:
                                     break
-                                position_to_check - relative_position
+                                position_to_check + diff
 
                 except IndexError:
                         continue
